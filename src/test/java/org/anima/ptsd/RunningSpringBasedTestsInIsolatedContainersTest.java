@@ -14,6 +14,8 @@ public class RunningSpringBasedTestsInIsolatedContainersTest {
     
     @Rule
     NewContainerAndConnectionRule asd = new NewContainerAndConnectionRule(); // with @Autowired context?
+    //actually, if I get a fresh db everytime what about the db schema?ù
+    //have to rerun hibernate each time (slow) or cache in a fresh new container before all tests
 
     @Test
     public void something(){
