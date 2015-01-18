@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration
 public class RunningSpringBasedTestsInIsolatedContainersTest {
     
-    @Rule
+    //@Rule
     NewContainerAndConnectionRule asd = new NewContainerAndConnectionRule(); // with @Autowired context?
     //actually, if I get a fresh db everytime what about the db schema?ù
     //have to rerun hibernate each time (slow) or cache in a fresh new container before all tests
