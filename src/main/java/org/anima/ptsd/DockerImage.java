@@ -4,6 +4,8 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.Image;
 import java.util.List;
+import net.emaze.dysfunctional.Reductions;
+import net.emaze.dysfunctional.dispatching.logic.Predicate;
 
 public class DockerImage {
 
@@ -13,10 +15,16 @@ public class DockerImage {
         this.tag = tag;
     }
 
-    public static DockerImage fromIndex(DockerClient docker, String tag) {
+    public static DockerImage fromIndex(DockerClient docker, final String tag) {
         try {
             final List<Image> images = docker.listImages();
-            boolean alreadyPulled = images.stream().anyMatch((image) -> image.repoTags().contains(tag));
+            final boolean alreadyPulled = Reductions.any(images, new Predicate<Image>() {
+
+                @Override
+                public boolean accept(Image image) {
+                    return image.repoTags().contains(tag);
+                }
+            });
             if (!alreadyPulled) {
                 docker.pull(tag);
             }

@@ -43,10 +43,4 @@ public class SofteningTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
-    public void wrapAThrowingConsumerSoftensToRuntimeEx() {
-        Softening.wrap((a) -> {
-            throw new IOException();
-        }).accept(1);
-    }
 }

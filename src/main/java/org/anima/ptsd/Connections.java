@@ -14,9 +14,17 @@ public class Connections {
         final SocketAddress a = new InetSocketAddress(address, port);
         int i = 0;
         for (; !canConnect(a) && i != maxRetries; i++) {
-            Softening.wrap((Softening.ThrowingConsumer<Long>) Thread::sleep).accept(retryIntervalMillis);
+            softenedSleep(retryIntervalMillis);
         }
         return i < maxRetries;
+    }
+
+    private static void softenedSleep(long timeoutMillis) {
+        try {
+            Thread.sleep(timeoutMillis);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private static boolean canConnect(SocketAddress address) {

@@ -4,7 +4,6 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.anima.ptsd.Softening.ThrowingConsumer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,22 +13,34 @@ public class ConnectionsTest {
     public void blocksUntilAvailable() throws Exception {
         final InetAddress localhost = Inet4Address.getLocalHost();
         final int port = availablePort(localhost);
-        new Thread(() -> {
-            Softening.wrap((ThrowingConsumer<Long>) Thread::sleep).accept(1000l);
-            ServerSocket serverSocket = null;
-            Socket connection = null;
-            try {
-                serverSocket = new ServerSocket(port, 1, localhost);
-                connection = serverSocket.accept();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            } finally {
-                Softening.close(connection);
-                Softening.close(serverSocket);
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                softenedSleep(1000l);
+                ServerSocket serverSocket = null;
+                Socket connection = null;
+                try {
+                    serverSocket = new ServerSocket(port, 1, localhost);
+                    connection = serverSocket.accept();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    Softening.close(connection);
+                    Softening.close(serverSocket);
+                }
             }
         }).start();
         final boolean available = Connections.awaitAvailable(localhost, port, 3, 500);
         Assert.assertTrue(available);
+    }
+
+    private static void softenedSleep(long intervalMillis) {
+        try {
+            Thread.sleep(intervalMillis);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Test
